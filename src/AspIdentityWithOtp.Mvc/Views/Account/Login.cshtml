@@ -1,0 +1,12 @@
+﻿@model AspIdentityWithOtp.Mvc.Models.ViewModels.LoginViewModel
+
+<form asp-controller="Account" asp-action="Login" method="post">
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+    <div class="form-group">
+        <label asp-for="@Model.PhoneNumber"></label>
+        <input type="text" asp-for="PhoneNumber" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>

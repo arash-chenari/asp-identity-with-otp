@@ -1,0 +1,11 @@
+﻿@model AspIdentityWithOtp.Mvc.Models.ViewModels.VerifyUserRegistrationViewModel
+
+<form asp-action="VerifyUserRegistration" , asp-controller="Account" method="post">
+    <input type="hidden" asp-for="PhoneNumber" value="@ViewBag.PhoneNumber" />
+    <div class="form-group">
+        <labl for="Code">VerificationCode</labl>
+        <input type="text" asp-for="Code" class="form-control"/>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>

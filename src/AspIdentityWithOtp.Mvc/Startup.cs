@@ -1,13 +1,14 @@
+using AspIdentityWithOtp.Mvc.Controllers;
+using AspIdentityWithOtp.Mvc.Infrastructure;
+using AspIdentityWithOtp.Mvc.Models;
+using AspIdentityWithOtp.Mvc.Models.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AspIdentityWithOtp.Mvc
 {
@@ -20,13 +21,29 @@ namespace AspIdentityWithOtp.Mvc
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration["ConnectionString"]));
+
+            services.AddIdentity<User,IdentityRole>(options =>
+                {
+                    options.User.AllowedUserNameCharacters = "0123456789";
+                    options.User.RequireUniqueEmail = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddTransient<ISmsService, SmsService>();
+            services.AddTransient<IUserVerificationCodeRepository, UserVerificationCodeRepository>();
+            services.AddTransient<ITempUserRegistrationRepository, TempUserRegistrationRepository>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -36,7 +53,6 @@ namespace AspIdentityWithOtp.Mvc
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -44,6 +60,7 @@ namespace AspIdentityWithOtp.Mvc
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

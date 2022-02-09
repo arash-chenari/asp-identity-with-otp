@@ -1,0 +1,11 @@
+﻿@model AspIdentityWithOtp.Mvc.Models.ViewModels.UserVerificationCodeViewModel
+
+<form asp-action="VerifyUser" asp-controller="Account">
+    <input type="hidden" asp-for="UserId" value="@ViewBag.UserId" />
+    <div class="form-group">
+        <label asp-for="Code">VerificationCode</label>
+        <input type="text" asp-for="Code" />
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>
